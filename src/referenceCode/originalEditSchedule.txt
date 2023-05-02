@@ -1,0 +1,567 @@
+  // store edits here until submit
+  let edittedCourses = [];
+
+  // temporary course outline
+  let temporaryCourse = {
+    originalCourseName: "",
+    courseName: "",
+    courseCode: "",
+    sectionNumber: "",
+    creditHours: "",
+    meetFrequencies: "",
+    meetTime: "",
+    meetRoom: "",
+    professor: "",
+  };
+
+  // helper function to determine if a temporaryCourse object exists for some course in props
+  const hasBeenEdited = (courseName) => {
+    edittedCourses.forEach((course) => {
+      if (course.originalCourseName === courseName) {
+        return true;
+      }
+    });
+    return false;
+  };
+
+  // update the schedule
+  const handleSubmit = () => {
+    // close the menu
+    props.updateEditor();
+
+    if (edittedCourses.length > 0) {
+      console.log("edits were made");
+      edittedCourses.forEach((edittedCourse) => {
+        props.currentSchedule.courses.forEach((originalCourse) => {
+          for (const key in edittedCourse) {
+            if (
+              edittedCourse[key] !== "" &&
+              originalCourse.hasOwnProperty(key)
+            ) {
+              // update the course
+              originalCourse[key] = edittedCourse[key];
+            }
+          }
+        });
+      });
+      props.updateSchedule(props.currentSchedule.id, props.currentSchedule);
+    } else {
+      console.log("no edits were made");
+    }
+  };
+
+  const handleChange = (e) => {
+    // loop through courses, if the course matches with the one being edited, update that
+    // grab the name of course being edited
+    const originalCourseName = e.target.classList[0];
+
+    const attributeEdited = e.target.id;
+    console.log(attributeEdited);
+
+    // grab the new course edit
+    const newAttribute = e.target.value;
+
+    // FIND EDITED COURSE
+    props.currentSchedule.courses.forEach((course) => {
+      // grab the course being edited
+      if (course.courseName === originalCourseName) {
+        // create and push a new temporaryCourse if not yet edited
+        if (!hasBeenEdited(originalCourseName)) {
+          var newTempCourse = temporaryCourse;
+          newTempCourse.originalCourseName = originalCourseName;
+          edittedCourses.push(newTempCourse);
+        }
+
+        // apply edits
+        edittedCourses.forEach((course) => {
+          console.log(course.originalCourseName);
+          if (course.originalCourseName === originalCourseName) {
+            if (course.hasOwnProperty(attributeEdited)) {
+              course[attributeEdited] = newAttribute;
+            }
+          }
+        });
+      }
+    });
+  };
+
+
+
+  vestion 2
+                // <div className="course-edit-container" key={index}>
+              //   <div className="name-delete-container">
+              //     <h3>{course.courseName}</h3>
+              //     <i
+              //       className="fa-regular fa-trash-can"
+              //       onClick={() => {
+              //         editManager.removeCourse(course.id, props);
+              //         decreaseNumCourses();
+              //       }}
+              //     ></i>
+              //   </div>
+              //   <div className="course-boxes">
+              //     <div className="box box-1">
+              //       <label htmlFor="">Course Name</label>
+              //       <input
+              //         id="courseName"
+              //         type="text"
+              //         defaultValue={course.courseName}
+              //         onChange={editManager.handleChange}
+              //         className={course.id}
+              //       />
+
+              //       <label htmlFor="">Course Code</label>
+              //       <input
+              //         type="text"
+              //         defaultValue={course.courseCode}
+              //         id="courseCode"
+              //         onChange={editManager.handleChange}
+              //         className={course.id}
+              //       />
+
+              //       <label htmlFor="">Section Number</label>
+              //       <input
+              //         type="text"
+              //         defaultValue={course.sectionNumber}
+              //         id="sectionNumber"
+              //         className={course.id}
+              //         onChange={editManager.handleChange}
+              //       />
+
+              //       <label htmlFor="">Credit Hours</label>
+              //       <input
+              //         type="text"
+              //         defaultValue={course.creditHours}
+              //         id="creditHours"
+              //         onChange={editManager.handleChange}
+              //         className={course.id}
+              //       />
+              //     </div>
+              //     <div className="box box-2">
+              //       <label htmlFor="">Meet Days</label>
+              //       <input
+              //         type="text"
+              //         defaultValue={course.meetFrequencies}
+              //         id="meetFrequencies"
+              //         onChange={editManager.handleChange}
+              //         className={course.id}
+              //       />
+
+              //       <label htmlFor="">Meet Time</label>
+              //       <input
+              //         type="text"
+              //         defaultValue={course.meetTime}
+              //         id="meetTime"
+              //         className={course.id}
+              //         onChange={editManager.handleChange}
+              //       />
+
+              //       <label htmlFor="">Meet Room</label>
+              //       <input
+              //         type="text"
+              //         defaultValue={course.meetRoom}
+              //         id="meetRoom"
+              //         className={course.id}
+              //         onChange={editManager.handleChange}
+              //       />
+
+              //       <label htmlFor="">Professor</label>
+              //       <input
+              //         type="text"
+              //         defaultValue={course.professor}
+              //         id="professor"
+              //         className={course.id}
+              //         onChange={editManager.handleChange}
+              //       />
+              //     </div>
+              //   </div>
+              //   <span className="divider"></span>
+              // </div>
+
+EditManager backup
+import Course from "./Course";
+
+// handles edits done to courses in a schedule
+class EditManager {
+  constructor(currentSchedule) {
+    this.currentSchedule = currentSchedule;
+
+    // store edits until submit
+    this.edittedCourses = [];
+
+    // temporary course outline
+    this.temporaryCourse = {
+      originalCourseName: "",
+      courseName: "",
+      courseCode: "",
+      sectionNumber: "",
+      creditHours: "",
+      meetFrequencies: "",
+      meetTime: "",
+      meetRoom: "",
+      professor: "",
+      id: "",
+    };
+  }
+
+  removeCourse = (id, props) => {
+    // decrement count (done from EditSchedule)
+    // remove from this.currentSchedule
+    this.currentSchedule.courses.forEach((course) => {
+      if (course.id === id) {
+        this.currentSchedule.removeCourse(course);
+      }
+    });
+
+    // update schedule
+    props.updateSchedule(this.currentSchedule.id, this.currentSchedule);
+  };
+
+  addCourse = () => {
+    var newCourse = new Course("", "", "", "", "", "", "", "");
+    this.currentSchedule.addCourse(newCourse);
+  };
+
+  // helper function to determine if a this.temporaryCourse object exists for some course in props
+  hasBeenEdited = (id) => {
+    this.edittedCourses.forEach((course) => {
+      if (course.id === id) {
+        return true;
+      }
+    });
+    return false;
+  };
+
+  checkMeetFrequencies = (id) => {
+    // meetFrequencies ex = [M, W, F]
+    // implement, there must be a space between and one of M, T, W, Th, F
+    function capitalize(word) {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }
+
+    const getInputsForId = document.getElementsByClassName(id);
+    let daysValue;
+    for (var i = 0; i < getInputsForId.length; i++) {
+      var element = getInputsForId[i];
+      if (element.id === "meetFrequencies") {
+        daysValue = element.value;
+      }
+    }
+
+    const validDays = ["M", "T", "W", "Th", "F"];
+    var meetFrequencies = daysValue.split(" ");
+    for (i = 0; i < meetFrequencies.length; i++) {
+      let capLetter = capitalize(meetFrequencies[i]);
+
+      if (validDays.includes(capLetter) === false) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  checkMeetTime = (id) => {
+    // implement, no time less than 6AM or greater than 6PM.  Start time cannot be smaller than end time
+    const getInputsForId = document.getElementsByClassName(id);
+
+    let timeString;
+    for (var i = 0; i < getInputsForId.length; i++) {
+      var element = getInputsForId[i];
+      if (element.id === "meetTime") {
+        timeString = element.value;
+      }
+    }
+
+    const startTime = timeString.slice(0, 5);
+    const endTime = timeString.slice(8, 13);
+
+    // make ints for startHour
+    if (startTime[0] === "0") {
+      var startHour = parseInt(startTime[1]);
+    } else {
+      startHour = parseInt(startTime.slice(0, 2));
+    }
+
+    // make ints for endHour
+    if (endTime[0] === "0") {
+      var endHour = parseInt(endTime[1]);
+    } else {
+      endHour = parseInt(endTime.slice(0, 2));
+    }
+
+    // convert
+    // convert to 24 hour time
+    // console.log("letter of the startHour", timeString.slice(5, 6));
+    if (timeString.slice(5, 6) === "P") {
+      startHour += 12;
+    }
+
+    if (timeString.slice(13, 14) === "P") {
+      endHour += 12;
+    }
+
+    // calculate differences
+    var hourDifference = endHour - startHour;
+    if (hourDifference < 0) {
+      return false;
+    }
+
+    return true;
+  };
+
+  checkEmpty = (id) => {
+    const getInputsForId = document.getElementsByClassName(id);
+    for (var i = 0; i < getInputsForId.length; i++) {
+      var element = getInputsForId[i];
+      if (
+        element.value === "" ||
+        element.value === undefined ||
+        element.value === null
+      ) {
+        return true;
+      }
+    }
+    return;
+  };
+
+  // determine if a course has all valid inputs
+  checkInputs = () => {
+    for (var i = 0; i < this.currentSchedule.courses.length; i++) {
+      for (const key in this.currentSchedule.courses[i]) {
+        if (key === "meetFrequencies") {
+          // console.log(
+          //   "checking meet frequencies",
+          //   this.checkMeetFrequencies(this.currentSchedule.courses[i].id)
+          // );
+          if (
+            this.checkMeetFrequencies(this.currentSchedule.courses[i].id) ===
+            false
+          ) {
+            return false;
+          }
+        } else if (key === "meetTime") {
+          // console.log(
+          //   "checking meet time",
+          //   this.checkMeetTime(this.currentSchedule.courses[i].id)
+          // );
+          if (
+            this.checkMeetTime(this.currentSchedule.courses[i].id) === false
+          ) {
+            return false;
+          }
+        } else {
+          if (this.checkEmpty(this.currentSchedule.courses[i].id) === true) {
+            return false;
+          }
+        }
+        if (this.checkOverlap(this.currentSchedule.courses[i]) === true) {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
+  // return an array of days that the courses had overlap
+  findDayOverlap = (courseInputs, courseTwo) => {
+    // console.log(courseInputs);
+    let oneDays = courseInputs.split(" ");
+    let twoDays = courseTwo.meetFrequencies.split(" ");
+
+    let overlaps = [];
+    oneDays.forEach((day) => {
+      if (twoDays.includes(day)) {
+        overlaps.push(day);
+      }
+    });
+
+    return overlaps;
+  };
+
+  timeToInt24 = (timeString) => {
+    if (timeString[0] === "0") {
+      var timeHour = parseInt(timeString[1]);
+    } else {
+      timeHour = parseInt(timeString.slice(0, 2));
+    }
+
+    if (timeString[3] === "0") {
+      var timeMinutes = parseInt(timeString[4]);
+    } else {
+      timeMinutes = parseInt(timeString.slice(3, 5));
+    }
+
+    // convert 24 hour if needed
+    if (timeString.slice(5, 6) === "P") {
+      timeHour += 12;
+    }
+
+    // make minutes a fraction of an hour
+    timeMinutes /= 60;
+
+    return timeHour + timeMinutes;
+  };
+
+  // one course starts before the other course ends.  so startTime1 < endTime2 or startTime2 < endTime1
+  findTimeOverlap = (courseOne, courseTwo) => {
+    let oneTime = courseOne.meetTime;
+    let twoTime = courseTwo.meetTime;
+
+    // grab start and end times of each course
+    const oneStartTime = oneTime.slice(0, 7);
+    const oneEndTime = oneTime.slice(8, 15);
+
+    const twoStartTime = twoTime.slice(0, 7);
+    const twoEndTime = twoTime.slice(8, 15);
+    // // convert to 24 hour time
+    // create ints out of times for comparison.  INTs are some fraction of an hour on the whole hour (in 24 hour time)
+    // console.log("end time course one", oneEndTime);
+    const courseOneStartInt = this.timeToInt24(oneStartTime);
+    const courseOneEndInt = this.timeToInt24(oneEndTime);
+    const courseTwoStartInt = this.timeToInt24(twoStartTime);
+    const courseTwoEndInt = this.timeToInt24(twoEndTime);
+
+    // console.log("one start", courseOneStartInt);
+    // console.log("one end", courseOneEndInt);
+    // console.log("two start", courseTwoStartInt);
+    // console.log("two end", courseTwoEndInt);
+
+    if (courseOneStartInt < courseTwoEndInt) {
+      return "Course one " + oneTime + " overlaps with course two " + twoTime;
+    } else if (courseTwoStartInt < courseOneEndInt) {
+      return "Course two " + twoTime + ", overlaps with course one " + twoTime;
+    } else if (courseOneStartInt === courseTwoStartInt) {
+      return "Course one " + oneTime + " overlaps with course two " + twoTime;
+    }
+    return "";
+  };
+
+  // check if the current course overlaps with others
+  checkOverlap = (course) => {
+    const id = course.id;
+
+    const getInputsForId = document.getElementsByClassName(id);
+
+    for (var i = 0; i < this.currentSchedule.courses.length; i++) {
+      var schedCourse = this.currentSchedule.courses[i];
+
+      // console.log(schedCourse.id !== id);
+      if (schedCourse.id !== id) {
+        // console.log(schedCourse.id, id);
+        let sameRoom =
+          getInputsForId.meetRoom.value === schedCourse["meetRoom"];
+        let sameProfessor =
+          getInputsForId.professor.value === schedCourse["professor"];
+
+        let inputtedMeetDays = getInputsForId.meetFrequencies.value;
+        let inputtedMeetTimes = getInputsForId.meetTime.value;
+
+        if (sameRoom || sameProfessor) {
+          var overlappingDays = this.findDayOverlap(
+            inputtedMeetDays,
+            schedCourse
+          );
+
+          console.log(
+            "for inputted id: " +
+              id +
+              " and course: " +
+              schedCourse.id +
+              " found overlap: " +
+              overlappingDays
+          );
+          var overlappingTimes = this.findTimeOverlap(course, schedCourse);
+
+          // console.log(
+          //   "passed meetdays " +
+          //     inputtedMeetDays +
+          //     id +
+          //     " loop course days " +
+          //     schedCourse.meetFrequencies +
+          //     schedCourse.id
+          // );
+          if (overlappingDays.length !== 0 && overlappingTimes.length !== 0) {
+            //conflict found
+            // console.log("conflict found");
+            console.log(overlappingDays);
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  };
+
+  // update the schedule
+  handleSubmit = (props) => {
+    // only perform updates if edits were made
+    if (this.edittedCourses.length > 0) {
+      // loop each edit
+      this.edittedCourses.forEach((edittedCourse) => {
+        // loop original courses
+        this.currentSchedule.courses.forEach((originalCourse) => {
+          // edits applied to matching ids
+          if (edittedCourse.id === originalCourse.id) {
+            // apply edits via keys in edittedCourses
+            for (const key in edittedCourse) {
+              // key must have been editted and exist in original course
+              if (
+                edittedCourse[key] !== "" &&
+                originalCourse.hasOwnProperty(key)
+              ) {
+                // update the course
+                originalCourse[key] = edittedCourse[key];
+              }
+            }
+          }
+        });
+      });
+
+      // check for overlaps in the schedules courses
+
+      props.updateSchedule(this.currentSchedule.id, this.currentSchedule);
+    } else {
+      console.log("no edits were made");
+    }
+  };
+
+  handleChange = (e) => {
+    // loop through courses, if the course matches with the one being edited, update that
+    // grab the name of course being edited
+
+    if (e.target.classList[0]) {
+      var originalCourseId = e.target.classList[0];
+    } else {
+      originalCourseId = "";
+    }
+
+    const attributeEdited = e.target.id;
+
+    // grab the new course edit
+    const newAttribute = e.target.value;
+
+    // FIND EDITED COURSE
+    this.currentSchedule.courses.forEach((course) => {
+      // grab the course being edited
+      if (course.id === originalCourseId) {
+        // create and push a new this.temporaryCourse if not yet edited
+        if (!this.hasBeenEdited(originalCourseId)) {
+          var newTempCourse = this.temporaryCourse;
+          newTempCourse.id = originalCourseId;
+          this.edittedCourses.push(newTempCourse);
+        }
+
+        // apply edits
+        this.edittedCourses.forEach((course) => {
+          if (course.id === originalCourseId) {
+            if (course.hasOwnProperty(attributeEdited)) {
+              course[attributeEdited] = newAttribute;
+            }
+          }
+        });
+      }
+    });
+  };
+}
+
+export default EditManager;
